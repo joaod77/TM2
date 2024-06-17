@@ -88,14 +88,14 @@ class MainScene extends Phaser.Scene {
 
     this.anims.create({
         key: 'fire_run',
-        frames: this.anims.generateFrameNumbers('FireSword', { start: 8, end: 15 }), // 8 frames de corrida
+        frames: this.anims.generateFrameNumbers('FireSword', { start: 28, end: 35 }), // 8 frames de corrida
         frameRate: 10,
         repeat: -1
     });
 
     this.anims.create({
         key: 'fire_jump_up',
-        frames: this.anims.generateFrameNumbers('FireSword', { start: 16, end: 18 }), // 3 frames de salto para cima
+        frames: this.anims.generateFrameNumbers('FireSword', { start: 56, end: 58 }), // 3 frames de salto para cima
         frameRate: 10,
         repeat: 0
     });
@@ -184,14 +184,20 @@ class MainScene extends Phaser.Scene {
     
     player.body.velocity.x = 0;  // Reset horizontal velocity
 
-    player.anims.play('fire_idle', true);
+    //player.anims.play('fire_idle', true);
 
     if (cursors.left.isDown) {
         player.body.velocity.x = -speed;
+        player.anims.play('fire_run', true);
+        player.flipX = true;
         
     } else if (cursors.right.isDown) {
         player.body.velocity.x = speed;
-    }  
+        player.anims.play('fire_run', true);
+        player.flipX = false;
+    }else{
+        player.anims.play('fire_idle', true);
+    }
 
 
     /*if (cursors.left.isDown) {
@@ -225,7 +231,7 @@ class MainScene extends Phaser.Scene {
     if ((cursors.up.isDown || this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE), 500)) && player.body.blocked.down) {
         
         player.body.velocity.y = jumpSpeed;
-        
+        player.anims.play('fire_jump_up', true);
     }
 
      // Controle de ataque
