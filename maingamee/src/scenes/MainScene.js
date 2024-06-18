@@ -2,7 +2,7 @@ class MainScene extends Phaser.Scene {
     constructor() {
         super("mainScene");
     }
-
+/*
     preload() {
     this.load.spritesheet('slime', 'assets/enemies/slime1s.png', { frameWidth: 64, frameHeight: 64 });
     this.load.image('tile', 'assets/tiles/tileset1.png');
@@ -12,7 +12,7 @@ class MainScene extends Phaser.Scene {
     this.load.spritesheet('KatanaSword', 'assets/player/DarkSamurai.png', { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet('FireSword', 'assets/player/fire.png' , { frameWidth: 288, frameHeight: 128 });
     this.load.spritesheet('portal', 'assets/builds/portal1.png', { frameWidth: 32, frameHeight: 32 });
- }
+ }*/
 
     create() 
     {
@@ -48,7 +48,7 @@ class MainScene extends Phaser.Scene {
     //player.setBounce(0.2);
     //player.setCollideWorldBounds(true);
 
-    player = this.physics.add.sprite(100, 450, 'FireSword');
+    /*player = this.physics.add.sprite(100, 450, 'FireSword');
     player.setCollideWorldBounds(true);
 
     player.body.setSize(32, 64); // Substitua 64 e 192 pelos valores corretos do frameWidth e frameHeight do 'HiddenSwordIdle'
@@ -56,9 +56,16 @@ class MainScene extends Phaser.Scene {
     // Ajuste do centro do corpo físico para centralizá-lo no sprite
     player.body.setOffset(128, 64); // Metade do width e height do tamanho do corpo físico
 
-    cursors = this.input.keyboard.createCursorKeys();
+    
+
+    cursors = this.input.keyboard.createCursorKeys(); */
+
+    // Create player
+    player = new Player(this, 100, 450);
 
     this.physics.add.collider(player, platforms);
+
+    //this.physics.add.collider(player, platforms);
 
     this.physics.add.overlap(player, portal, this.teleport, null, this);
     //this.physics.add.overlap(player, portal,)
@@ -78,7 +85,7 @@ class MainScene extends Phaser.Scene {
     });*/
 
 
-    // Criação das animações do FireSword
+    /*// Criação das animações do FireSword
     this.anims.create({
         key: 'fire_idle',
         frames: this.anims.generateFrameNumbers('FireSword', { start: 0, end: 7 }), // 8 frames de idle
@@ -102,7 +109,7 @@ class MainScene extends Phaser.Scene {
 
     this.anims.create({
         key: 'fire_jump_down',
-        frames: this.anims.generateFrameNumbers('FireSword', { start: 19, end: 21 }), // 3 frames de salto para baixo
+        frames: this.anims.generateFrameNumbers('FireSword', { start: 84, end: 86 }), // 3 frames de salto para baixo
         frameRate: 10,
         repeat: 0
     });
@@ -170,16 +177,21 @@ class MainScene extends Phaser.Scene {
     */
 
 
+    //this.cameras.main.startFollow(player);
+    //this.cameras.main.setBounds(0, 0, map1.widthInPixels, map1.heightInPixels);
+    //this.physics.world.setBounds(0, 0, map1.widthInPixels, map1.heightInPixels); // Define os limites do mundo conforme o tamanho do mapa
+
     this.cameras.main.startFollow(player);
     this.cameras.main.setBounds(0, 0, map1.widthInPixels, map1.heightInPixels);
-    this.physics.world.setBounds(0, 0, map1.widthInPixels, map1.heightInPixels); // Define os limites do mundo conforme o tamanho do mapa
+    this.physics.world.setBounds(0, 0, map1.widthInPixels, map1.heightInPixels);
 
     //this.scene.start("Scene2");
     
  }
 
     update() {   
-    const speed = 200;
+        player.update();
+    /*const speed = 200;
     const jumpSpeed = -600;
     
     player.body.velocity.x = 0;  // Reset horizontal velocity
@@ -228,10 +240,19 @@ class MainScene extends Phaser.Scene {
     }*/
 
     // Jumping logic
-    if ((cursors.up.isDown || this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE), 500)) && player.body.blocked.down) {
+    /*if ((cursors.up.isDown || this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE), 500)) && player.body.blocked.down) {
         
         player.body.velocity.y = jumpSpeed;
         player.anims.play('fire_jump_up', true);
+    }
+
+    // Determine if player is jumping or falling
+    if (player.body.velocity.y < 0) {
+        player.anims.play('fire_jump_up', true);
+    } else if (player.body.velocity.y > 0) {
+        player.anims.play('fire_jump_down', true);
+    } else if (player.body.blocked.down) {
+        player.anims.play('fire_idle', true);
     }
 
      // Controle de ataque
