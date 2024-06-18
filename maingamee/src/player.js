@@ -66,7 +66,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.anims.play('fire_run', true);
         this.flipX = false;
     }else{
-        this.anims.play('fire_idle', true);
+        // If no movement input, play idle animation
+        if (this.body.blocked.down) {
+            this.anims.play('fire_idle', true);
+        }
     }
 
 
@@ -105,12 +108,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     // Determine if player is jumping or falling
-    if (this.body.velocity.y < 0) {
-        this.anims.play('fire_jump_up', true);
-    } else if (this.body.velocity.y > 0) {
-        this.anims.play('fire_jump_down', true);
-    } else if (this.body.blocked.down) {
-        this.anims.play('fire_idle', true);
+    if (this.body.velocity.y !== 0) {
+        if (this.body.velocity.y < 0) {
+            this.anims.play('fire_jump_up', true);
+        } else {
+            this.anims.play('fire_jump_down', true);
+        }
     }
 
      // Controle de ataque
