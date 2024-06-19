@@ -1,6 +1,7 @@
 class MainScene extends Phaser.Scene {
     constructor() {
         super("mainScene");
+        this.enemies = {}; //Armazenar os inimigos por nome
     }
 /*
     preload() {
@@ -46,26 +47,30 @@ class MainScene extends Phaser.Scene {
 
     // Create player
     player = new Player(this, 100, 450);
+    slime = new Slime(this, 1500, 1000);
+
+    enemies = this.physics.add.group();
+
+    this.enemies['slime1'] = new Slime(this, 1400, 1000);
+    enemies.add(this.enemies['slime1']);
+    
+    this.enemies['slime2'] = new Slime(this, 1300, 1000);
+    enemies.add(this.enemies['slime2']);
+
+    this.enemies['slime3'] = new Slime(this, 1200, 1000);
+    enemies.add(this.enemies['slime3']);
 
     this.physics.add.collider(player, platforms);
+    this.physics.add.collider(enemies, platforms);
+
+    // Detecção de colisão entre ataque do jogador e slime
+    //this.physics.add.overlap(player.rangeGraphics.getBounds(), slime.getBounds(), () => {
+    //    console.log("Enemy hit!"); // Log when slime is hit
+    //});
 
 
     this.physics.add.overlap(player, portal, this.teleport, null, this);
     
-
-    //Criação das animações do slime
-    /*this.anims.create({
-        key: 'move',
-        frames: this.anims.generateFrameNumbers('slime', {start: 0, end: 3}),
-        frameRate: 7,
-        repeat: -1
-    });
-
-    this.anims.create({
-        key: 'stand',
-        frames: [ { key: 'slime', frame: 0 } ],
-        frameRate: 20
-    });*/
 
     this.anims.create({
         key: 'portal_anim',
@@ -81,11 +86,35 @@ class MainScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, map1.widthInPixels, map1.heightInPixels);
 
     //this.scene.start("Scene2");
+    console.log(this.enemies);
+
     
  }
 
     update() {   
         player.update();
+
+        /*for (const enemyKey in this.enemies) {
+            const enemy = this.enemies[enemyKey];
+    
+            // Verifica se o inimigo ainda existe (ativo)
+            if (enemy.active) {
+                const enemyBounds = enemy.getBounds();
+                if (Phaser.Geom.Intersects.RectangleToRectangle(player.attackRange, enemyBounds)) {
+                    // Ação quando o inimigo é atingido pelo jogador
+                    player.handleAttackDamage(animation, frame, enemy);
+                }
+            } else {
+                // Se o inimigo não existe mais (foi destruído), remova-o da lista
+                delete this.enemies[enemyKey];
+            }
+        }*/
+        for (const enemyKey in this.enemies) {
+            const enemy = this.enemies[enemyKey];
+            if (!enemy.active) {
+               delete this.enemies[enemyKey];
+            }
+        }
 
 
  }

@@ -1,7 +1,7 @@
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: 1600,
+    height: 1600,
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -23,6 +23,9 @@ var attackPart = 0;
 var platforms;
 var trees;
 var portal;
+var slime;
+var enemyName;
+var enemies;
 /*
 var cursors;
 var player;

@@ -4,7 +4,7 @@ class Preload extends Phaser.Scene {
     }
 
     preload() {
-    this.load.spritesheet('slime', 'assets/enemies/slime1s.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('slime1', 'assets/enemies/slime1s.png', { frameWidth: 64, frameHeight: 64 });
     this.load.image('tile', 'assets/tiles/tileset1.png');
     this.load.tilemapTiledJSON('map1', 'assets/maps/firstRealm/map1.tmj');
     this.load.tilemapTiledJSON('map2', 'assets/maps/firstRealm/map2.tmj');
