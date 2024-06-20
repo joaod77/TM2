@@ -68,6 +68,29 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         repeat: 0
     });
 
+    this.anims.create({
+        key: 'orb_first',
+        frames: this.anims.generateFrameNumbers('orb', { start: 0, end: 1 }), // 3 frames de salto para baixo
+        frameRate: 10,
+        repeat: 10
+    });
+
+    this.anims.create({
+        key: 'orb_second',
+        frames: this.anims.generateFrameNumbers('orb', { start: 2, end: 4 }), // 3 frames de salto para baixo
+        frameRate: 10,
+        repeat: 10
+    });
+
+    this.anims.create({
+        key: 'orb_final',
+        frames: this.anims.generateFrameNumbers('orb', { start: 5, end: 5 }), // 3 frames de salto para baixo
+        frameRate: 10,
+        repeat: 0
+    });
+
+    this.play('orb_first');
+
     this.cursors = scene.input.keyboard.createCursorKeys();
 
     // Exemplo de propriedades adicionais
@@ -87,6 +110,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.dashDuration = 200;
     this.dashCooldown = 1000;
     this.lastDashTime = 0;
+
+    this.orbCooldown = 120000;
+    this.orb = scene.add.sprite(x + 32, y + 32, 'orb');
 
     // Gráfico para mostrar o retângulo de ataque
     this.attackRangeGraphics = scene.add.graphics();
@@ -169,6 +195,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     }
     //Ativar logica de ataque
     this.handleAttacks();
+
+    }
+
+    handleOrb() {
+        const pressKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
+
 
     }
     

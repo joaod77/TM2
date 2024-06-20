@@ -15,6 +15,7 @@ class Preload extends Phaser.Scene {
     this.load.spritesheet('KatanaSword', 'assets/player/DarkSamurai.png', { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet('FireSword', 'assets/player/fire.png' , { frameWidth: 288, frameHeight: 128 });
     this.load.spritesheet('portal', 'assets/builds/portal1.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('orb', 'assets/items/OrbofMysteries.png', { frameWidth: 64, frameHeight: 64 });
 }
 
     create() {
