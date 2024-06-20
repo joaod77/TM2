@@ -98,9 +98,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     const jumpSpeed = -600;
     const currentTime = this.scene.time.now; // Adicionado para registrar o tempo atual
 
-    console.log(`Current time: ${currentTime}`);
-    console.log(`Last dash time: ${this.lastDashTime}`);
-    console.log(`Dash cooldown: ${this.dashCooldown}`);
+    //console.log(`Current time: ${currentTime}`);
+    //console.log(`Last dash time: ${this.lastDashTime}`);
+    //console.log(`Dash cooldown: ${this.dashCooldown}`);
     
     //this.body.velocity.x = 0;  // Reset horizontal velocity
 
@@ -280,9 +280,15 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             // Display attack range visually
             //this.showAttackRange(rangeWidth, rangeHeight);
 
-                
             // Calculate attack range position based on player's position and direction
-            const attackRangeX = this.x - 32;
+            var attackRangeX;
+            if (this.flipX) {
+                // If player is facing left, adjust the attack range position
+                attackRangeX = this.x - rangeWidth + 32;
+            } else {
+                // If player is facing right, use the original calculation
+                attackRangeX = this.x - 32;
+            }
             const attackRangeY = this.y - 16;
 
             // Create a Phaser.Rectangle for attack range

@@ -13,7 +13,7 @@ const config = {
             debug: true
         }
     },
-    scene: [Preload, MainScene, Scene2]
+    scene: [Preload, MainScene, Scene2, Scene3]
 };
 
 const game = new Phaser.Game(config);
@@ -26,6 +26,7 @@ var portal;
 var slime;
 var enemyName;
 var enemies;
+//var back;
 /*
 var cursors;
 var player;
