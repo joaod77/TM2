@@ -89,7 +89,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         repeat: 0
     });
 
-    this.play('orb_first');
+    //this.play('orb_first');
 
     this.cursors = scene.input.keyboard.createCursorKeys();
 
@@ -111,8 +111,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.dashCooldown = 1000;
     this.lastDashTime = 0;
 
-    this.orbCooldown = 120000;
-    this.orb = scene.add.sprite(x + 32, y + 32, 'orb');
+    //this.orbCooldown = 120000;
+    //this.orb = scene.add.sprite(x + 32, y + 32, 'orb');
 
     // Gráfico para mostrar o retângulo de ataque
     this.attackRangeGraphics = scene.add.graphics();
@@ -196,16 +196,16 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     //Ativar logica de ataque
     this.handleAttacks();
 
-    this.handleOrb();
+    //this.handleOrb();
 
     }
 
-    handleOrb() {
+    /*handleOrb() {
         const pressKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
         this.orb = this.scene.add.sprite(this.x + 32, this.y + 32, 'orb');
 
 
-    }
+    }*/
     
     // Attack logic
     handleAttacks() {
