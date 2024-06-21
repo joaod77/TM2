@@ -8,10 +8,6 @@ class HealthBar {
         this.height = height;
         this.value = health; // Valor inicial da vida (porcentagem)
 
-        //if(isPlayer) {
-        //    this.draw();
-        //}
-        //this.draw();
 
         scene.add.existing(this.bar);
     }
@@ -59,5 +55,3 @@ class HealthBar {
         this.draw();
     }
 }
-
-//window.healthBar = HealthBar;

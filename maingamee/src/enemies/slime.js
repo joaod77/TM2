@@ -37,12 +37,12 @@ class Slime extends Phaser.Physics.Arcade.Sprite {
         });
 
         // Iniciar a animação padrão
-        this.play('stand'); // 'move' é o nome da animação de movimento
+        this.play('stand');
 
         // Criar o retângulo centrado no slime usando Phaser.Geom.Rectangle
         this.rectangle = new Phaser.Geom.Rectangle(x - 188, y - 96, 384, 192); // x - 24 e y - 24 para centralizar
         this.rectangleGraphics = scene.add.graphics({ lineStyle: { color: 0xff0000 } });
-        this.rectangleGraphics.strokeRectShape(this.rectangle);
+        //this.rectangleGraphics.strokeRectShape(this.rectangle);
 
         // Atualizar posição do retângulo com a posição do slime
         this.updateRectanglePosition();
@@ -51,8 +51,6 @@ class Slime extends Phaser.Physics.Arcade.Sprite {
 
         this.enterRange = false;
 
-        // Atualizar a posição da barra de vida com a posição do slime
-        //this.updateHealthBarPosition();
     }
 
     update() {
@@ -67,8 +65,8 @@ class Slime extends Phaser.Physics.Arcade.Sprite {
         this.rectangle.y = this.y - 96;
 
         // Limpar e redesenhar o retângulo com a nova posição
-        this.rectangleGraphics.clear();
-        this.rectangleGraphics.strokeRectShape(this.rectangle);
+        //this.rectangleGraphics.clear();
+        //this.rectangleGraphics.strokeRectShape(this.rectangle);
     }
 
     updateHealthBarPosition() {
@@ -77,8 +75,6 @@ class Slime extends Phaser.Physics.Arcade.Sprite {
         this.healthBar.y = this.y - 40;
     }
 
-    // Métodos adicionais específicos do inimigo podem ser definidos aqui
-    // Por exemplo: métodos para comportamentos específicos, IA, etc.
     getBoundsRectangle() {
         return this.rectangle;
     }

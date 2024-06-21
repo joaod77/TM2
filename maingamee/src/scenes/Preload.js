@@ -20,6 +20,10 @@ class Preload extends Phaser.Scene {
     this.load.spritesheet('FireSword', 'assets/player/fire.png' , { frameWidth: 288, frameHeight: 128 });
     this.load.spritesheet('portal', 'assets/builds/portal1.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('orb', 'assets/items/OrbofMysteries.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.audio('sword', 'assets/sound/sword.mp3');
+    this.load.audio('explosion', 'assets/sound/explosion.mp3');
+    this.load.audio('epicMusic', 'assets/sound/epicmusic.mp3');
+
 
 }
 
@@ -45,6 +49,9 @@ class Preload extends Phaser.Scene {
             frameRate: 10,
             repeat: 0
         });
+
+        this.backgroundMusic = this.sound.add('epicMusic');
+        this.backgroundMusic.play({ loop: true, volume: 0.05 });
 
         this.scene.start("mainScene");
     }
