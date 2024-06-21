@@ -1,7 +1,7 @@
 const config = {
     type: Phaser.AUTO,
-    width: 1600,
-    height: 1600,
+    width: 800,
+    height: 600,
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -13,7 +13,7 @@ const config = {
             debug: true
         }
     },
-    scene: [Preload, MainScene, Scene2, Scene3]
+    scene: [Preload, MainScene, Scene2, Scene3, ARScene1]
 };
 
 const game = new Phaser.Game(config);
@@ -26,6 +26,7 @@ var portal;
 var slime;
 var enemyName;
 var enemies;
+var lava;
 //var back;
 /*
 var cursors;

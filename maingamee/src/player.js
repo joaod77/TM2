@@ -11,6 +11,15 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.body.setSize(32, 64);
         this.body.setOffset(128, 64);
 
+        //const bounds = this.body.getBounds();
+        //console.log(bounds.width, bounds.height); // Isso vai mostrar 32 e 64, que são as dimensões do corpo físico definido
+        //console.log(this.body.getBounds()); // Verifique as dimensões do corpo físico
+
+    // Exemplo de propriedades adicionais
+    this.health = 100;
+    this.damage = 10;
+    this.attackSpeed = 10;
+
     // Criação das animações do FireSword
     this.anims.create({
         key: 'fire_idle',
@@ -43,21 +52,21 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.anims.create({
         key: 'fire_attack1',
         frames: this.anims.generateFrameNumbers('FireSword', { start: 252, end: 259 }), // 3 frames de salto para baixo
-        frameRate: 10,
+        frameRate: this.attackSpeed,
         repeat: 0
     });
 
     this.anims.create({
         key: 'fire_attack2',
         frames: this.anims.generateFrameNumbers('FireSword', { start: 260, end: 269 }), // 3 frames de salto para baixo
-        frameRate: 10,
+        frameRate: this.attackSpeed,
         repeat: 0
     });
 
     this.anims.create({
         key: 'fire_attack3',
         frames: this.anims.generateFrameNumbers('FireSword', { start: 270, end: 279 }), // 3 frames de salto para baixo
-        frameRate: 10,
+        frameRate: this.attackSpeed,
         repeat: 0
     });
 
@@ -68,34 +77,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         repeat: 0
     });
 
-    this.anims.create({
-        key: 'orb_first',
-        frames: this.anims.generateFrameNumbers('orb', { start: 0, end: 1 }), // 3 frames de salto para baixo
-        frameRate: 10,
-        repeat: -1
-    });
-
-    this.anims.create({
-        key: 'orb_second',
-        frames: this.anims.generateFrameNumbers('orb', { start: 2, end: 4 }), // 3 frames de salto para baixo
-        frameRate: 10,
-        repeat: 10
-    });
-
-    this.anims.create({
-        key: 'orb_final',
-        frames: this.anims.generateFrameNumbers('orb', { start: 5, end: 5 }), // 3 frames de salto para baixo
-        frameRate: 10,
-        repeat: 0
-    });
-
-    //this.play('orb_first');
-
     this.cursors = scene.input.keyboard.createCursorKeys();
 
-    // Exemplo de propriedades adicionais
-    this.baseHealth = 100;
-    this.baseDamage = 10;
+
 
     // Variáveis de ataque
     this.attackIndex = 0;
@@ -106,17 +90,44 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     // Variável para rastrear o estado de ataque
     this.isAttacking = false;
     this.isDashing = false;
+    this.canDoubleJump = false;
+    this.jumpSpeed = -600;
     this.dashSpeed = 600;
     this.dashDuration = 200;
     this.dashCooldown = 1000;
     this.lastDashTime = 0;
 
-    //this.orbCooldown = 120000;
-    //this.orb = scene.add.sprite(x + 32, y + 32, 'orb');
+    this.orbCooldown = 120000;
+    this.orb = scene.add.sprite(x + 32, y + 32, 'orb');
+    this.orb.setVisible(false);
+
+    // Cooldown do orb específico para cada realm
+    this.orbCooldownFirstRealm = 60000; // Cooldown de 120 segundos para o uso da orb no firstRealm
+    this.orbCooldownAltRealm = Infinity; // Cooldown infinito para o uso da orb no Realm Alternativo
+    this.lastOrbTime = 0; // Timestamp do último uso da orb
+
+    // Flag para identificar o realm atual do jogador
+    this.currentRealm = 'firstRealm';
 
     // Gráfico para mostrar o retângulo de ataque
     this.attackRangeGraphics = scene.add.graphics();
     this.attackRange = new Phaser.Geom.Rectangle(x - 32, y - 16, 0, 0);
+
+    this.playerUI = new PlayerUI(scene, this, scene.cameras.main);
+
+    console.log(`Scene Realm: ${this.scene.currentRealm}`);
+
+    this.healthBar = new HealthBar(scene, scene.cameras.main.scrollX + 100, scene.cameras.main.scrollY + 100, 100, 5, this.health, true); // Posição e dimensões da barra de vida
+
+    //this.healthBar.fixedToCamera = 'true';
+
+    // Criar o retângulo centrado no slime usando Phaser.Geom.Rectangle
+    this.rectangle = new Phaser.Geom.Rectangle(x - 16, y, 32, 64); // x - 24 e y - 24 para centralizar
+    this.rectangleGraphics = scene.add.graphics({ lineStyle: { color: 0xff0000 } });
+    this.rectangleGraphics.strokeRectShape(this.rectangle);
+
+    // Atualizar posição do retângulo com a posição do slime
+    this.updateRectanglePosition();
     }
 
     update() {
@@ -155,9 +166,19 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         }
     
         // Jumping logic
-        if ((this.cursors.up.isDown || this.scene.input.keyboard.checkDown(this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE), 500)) && this.body.blocked.down) {
-            this.body.velocity.y = jumpSpeed;
-            this.anims.play('fire_jump_up', true);
+        if (this.cursors.up.isDown || this.scene.input.keyboard.checkDown(this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE), 500)) {
+            if (this.body.blocked.down) {
+                // First Jump
+                this.setVelocityY(this.jumpSpeed);
+                this.anims.play('fire_jump_up', true);
+                this.canDoubleJump = true; 
+                
+            } else if (this.canDoubleJump) {
+                // Second Jump
+                this.setVelocityY(this.jumpSpeed);
+                this.anims.play('fire_jump_up', true);
+                this.canDoubleJump = false; 
+            }
         }
 
         // Determine if player is jumping or falling
@@ -196,16 +217,106 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     //Ativar logica de ataque
     this.handleAttacks();
 
-    //this.handleOrb();
+    this.handleOrb();
+
+    this.playerUI.update();
+
+    this.healthBar.updatePosition(this.scene.cameras.main.scrollX + 600, this.scene.cameras.main.scrollY + 50);
+
+    this.updateRectanglePosition();
 
     }
 
-    /*handleOrb() {
+
+    handleOrb() {
         const pressKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
-        this.orb = this.scene.add.sprite(this.x + 32, this.y + 32, 'orb');
+        const currentTime = this.scene.time.now;
 
+        // Verifica se é o primeiro uso da orb no FirstRealm
+        if (this.scene.currentRealm === 'firstRealm' && this.lastOrbTime === 0) {
+            this.lastOrbTime = currentTime - this.orbCooldownFirstRealm; // Inicia o cooldown para permitir o uso imediato
+        }
 
-    }*/
+        // Logs para verificar a condição de cooldown da orb
+        //console.log(`Current Time: ${currentTime}`);
+        //console.log(`Last Orb Time: ${this.lastOrbTime}`);
+        //console.log(`Orb Cooldown: ${this.getOrbCooldown()}`);
+
+        // Verifica se a tecla F foi pressionada e o cooldown já passou no realm atual
+        if (Phaser.Input.Keyboard.JustDown(pressKey) && (currentTime - this.lastOrbTime > this.getOrbCooldown())) {~
+            console.log("Tecla F pressionada para ativar o Orb.");
+            this.lastOrbTime = currentTime;
+            this.orb.setVisible(true);
+            this.orb.x = this.x + 32;
+            this.orb.y = this.y + 32;
+
+            this.orb.anims.play('orb_first');
+
+            // Após 3 segundos, mudar para 'orb_second'
+            this.scene.time.delayedCall(1000, () => {
+                this.orb.anims.play('orb_second');
+                this.orb.anims.currentAnim.frameRate = 10;
+
+                // Gradualmente aumentar a taxa de frames durante 10 segundos
+                for (var i = 1; i <= 10; i++) {
+                    this.scene.time.delayedCall(i * 1000, () => {
+                        this.orb.anims.currentAnim.frameRate += 10;
+                    });
+                }
+
+                // Após 10 segundos, mudar para 'orb_final' e teleportar se estiver no firstRealm
+                this.scene.time.delayedCall(1000, () => {
+                    this.orb.anims.play('orb_final');
+                    if (this.scene.currentRealm === 'firstRealm') {
+                        this.scene.time.delayedCall(500, () => {
+                            this.handleTeleportToAltRealm();
+                        });
+                    }
+
+                        // Após 2 segundos, desativar a orb (tornar invisível)
+                    this.scene.time.delayedCall(2000, () => {
+                        this.orb.setVisible(false);
+                    });
+                });
+            });
+        }
+
+        if (this.orb.visible) {
+            this.orb.x = this.x + 32;
+            this.orb.y = this.y + 32;
+        }
+    }
+
+    handleTeleportToAltRealm() {
+        // Implemente a lógica de teletransporte para o Realm Alternativo
+        // Exemplo:
+        // this.scene.scene.start('AltRealmScene');
+        // Defina o cooldown específico do orb para o Realm Alternativo
+        //this.currentRealm = 'AltRealm';
+        this.scene.scene.start('ARScene1');
+        //this.scene.time.delayedCall(10000, () => {
+        //    this.currentRealm = 'firstRealm';
+        //})
+    }
+
+    getOrbCooldown() {
+        // Retorna o cooldown correto com base no realm atual
+        if (this.scene.currentRealm === 'firstRealm') {
+            return this.orbCooldownFirstRealm;
+        } else {
+            return this.orbCooldownAltRealm;
+        }
+    }
+
+    getRemainingCooldown() {
+        // Retorna o tempo restante do cooldown da orb
+        const currentTime = this.scene.time.now;
+        if (this.scene.currentRealm === 'firstRealm') {
+            return Math.max(0, this.lastOrbTime + this.orbCooldownFirstRealm - currentTime);
+        } else {
+            return Math.max(0, this.lastOrbTime + this.orbCooldownAltRealm - currentTime);
+        }
+    }
     
     // Attack logic
     handleAttacks() {
@@ -292,6 +403,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         // Reduz a vida do inimigo com base no dano do ataque
         const { damage } = this.getAttackProperties(`fire_attack${this.attackIndex}`);
         enemy.health -= damage;
+        enemy.healthBar.decrease(damage);
 
         // Log para depuração
         console.log(`Enemy Hit! Enemy Health: ${enemy.health}`);
@@ -345,6 +457,33 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                 }
             }
         }
+    }
+
+    handleTakingDamage(amount) {
+        this.health -= amount;
+        this.healthBar.decrease(amount);
+        console.log(`Player health: ${this.health}`);
+        
+        // Adicione lógica adicional para quando a vida do jogador atingir 0, se necessário
+        if (this.health <= 0) {
+            console.log("Player died");
+
+            // Implementar lógica de morte do jogador
+        }
+    }
+
+    updateRectanglePosition() {
+        // Atualiza a posição do retângulo para estar centrado no slime
+        this.rectangle.x = this.x - 16;
+        this.rectangle.y = this.y;
+
+        // Limpar e redesenhar o retângulo com a nova posição
+        this.rectangleGraphics.clear();
+        this.rectangleGraphics.strokeRectShape(this.rectangle);
+    }
+
+    getBoundsRectangle() {
+        return this.rectangle;
     }
 
 

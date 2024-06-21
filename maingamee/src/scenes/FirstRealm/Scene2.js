@@ -2,6 +2,7 @@ class Scene2 extends Phaser.Scene {
     constructor() {
         super("Scene2");
         this.enemies = {};
+        this.currentRealm = 'firstRealm';
     }
 
     preload() {
@@ -10,8 +11,11 @@ class Scene2 extends Phaser.Scene {
 
     create() {
         //this.add.text(400, 300, 'This is Scene2', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5);
-        const background = this.add.image(800,800, 'back');
-        background.setScrollFactor(0);
+        const mapWidth = 3200;
+        const mapHeight = 3200;
+        const background = this.add.image(1600,1600, 'back');
+        //background.setScrollFactor(0);
+        background.setScale(mapWidth / background.width, mapHeight / background.height);
     
         //this.add.image(0,0,'slime')
         //this.add.image(400, 300, 'tile');
@@ -43,7 +47,7 @@ class Scene2 extends Phaser.Scene {
             this.scene.start('mainScene');
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F))) {
+        if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.N))) {
             this.scene.start('Scene3');
         }
 

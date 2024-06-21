@@ -17,8 +17,13 @@ class MainScene extends Phaser.Scene {
 
     create() 
     {
+    const mapWidth = 1600;
+    const mapHeight = 1600;
+
+
     const background = this.add.image(800,800, 'back');
-    background.setScrollFactor(0);
+    //background.setScrollFactor(0);
+    background.setScale(mapWidth / background.width, mapHeight / background.height);
 
     //this.add.image(0,0,'slime')
     //this.add.image(400, 300, 'tile');
@@ -47,6 +52,8 @@ class MainScene extends Phaser.Scene {
 
     // Create player
     player = new Player(this, 100, 450);
+    console.log("Width:" , player.width);
+    
     slime = new Slime(this, 1500, 1000);
 
     enemies = this.physics.add.group();
@@ -80,7 +87,6 @@ class MainScene extends Phaser.Scene {
     })
     portal.anims.play('portal_anim');
     
-
     this.cameras.main.startFollow(player);
     this.cameras.main.setBounds(0, 0, map1.widthInPixels, map1.heightInPixels);
     this.physics.world.setBounds(0, 0, map1.widthInPixels, map1.heightInPixels);
@@ -89,15 +95,72 @@ class MainScene extends Phaser.Scene {
     console.log(this.enemies);
 
 
-    this.physics.add.overlap(player, enemies, this.teleport, null, this);
-    
+    // Obtém as dimensões da câmera principal
+    const cameraWidth = this.cameras.main.width;
+    const cameraHeight = this.cameras.main.height;
+
+    // Retângulo opaco para fundo das opções de power-up
+    const bgRect = this.add.rectangle(cameraWidth / 2, cameraHeight / 2, 800, 200, 0x000000, 0.8);
+    bgRect.setOrigin(0.5); // Define a origem para o centro do retângulo
+    bgRect.setScrollFactor(0); // Para manter fixo na tela
+
+    // Exemplo: Mostrar as opções de power-up centralizadas na tela
+    const startY = cameraHeight / 2 - 50; // Posição inicial para as opções
+    const optionStyle = { fontSize: '24px', fill: '#ffffff', align: 'center' };
+
+    const powerUpOptions = PowerUps.getRandomOptions();
+
+    // Armazenar todas as opções de texto para posterior destruição
+    const optionTexts = [];
+
+    // Armazenar todos os eventos de teclado para posterior remoção
+    const keyboardEvents = [];
+
+    // Mostrar opções de power-up numeradas de 1 a 3 na tela
+    powerUpOptions.forEach((option, index) => {
+        const text = this.add.text(cameraWidth / 2, startY + index * 50, `${index + 1}. ${option.name}: ${option.description}`, optionStyle);
+        text.setOrigin(0.5); // Define a origem para o centro do texto
+        text.setScrollFactor(0); // Para manter fixo na tela
+        optionTexts.push(text);
+
+        // Captura de evento de teclado para escolher a opção
+        const key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE + index);
+        const keyEvent = key.on('down', () => {
+            // Aplica o efeito do power-up selecionado ao jogador
+            PowerUps.applyPowerUpEffect(player, option);
+            console.log(`Jogador escolheu: ${option.name}`);
+
+            // Remove o retângulo de fundo e os textos das opções de power-up da tela
+            bgRect.destroy();
+            optionTexts.forEach((text) => text.destroy());
+
+            // Remove todos os eventos de teclado associados
+            keyboardEvents.forEach(event => event.destroy());
+
+            // Opcional: Aguarde algum tempo antes de continuar para a próxima fase
+            this.time.delayedCall(2000, () => {
+                // Implemente aqui a transição para a próxima fase ou ação subsequente
+            });
+        });
+
+        keyboardEvents.push(keyEvent);
+
+        text.on('pointerdown', () => {
+            // Implemente aqui o tratamento para clique do mouse, se necessário
+            console.log(`Clicou na opção ${index + 1}`);
+        });
+});
+
+    console.log("Scene atual:", this.scene);
  }
 
     update() {   
         player.update();
+        //console.log(player.damage)
 
         for (const enemyKey in this.enemies) {
             this.enemies[enemyKey].update();
+            //this.handleDamageTakenEnemies();
         }
 
         //this.enemies['slime1'].update();
@@ -106,11 +169,30 @@ class MainScene extends Phaser.Scene {
 
         for (const enemyKey in this.enemies) {
             const enemy = this.enemies[enemyKey];
+            if (!enemy.active) continue;
             enemy.update();
-            if (Phaser.Geom.Intersects.RectangleToRectangle(enemy.getBoundsRectangle(), player.getBounds())){
+            if (Phaser.Geom.Intersects.RectangleToRectangle(enemy.getBoundsRectangle(), player.getBoundsRectangle())){
                 console.log("YESSIRES POGGERS");
                 console.log("Enemy bounds:", enemy.getBounds());
+                enemy.enterRange = true;
             }
+
+            if(enemy.enterRange){
+                this.chasePlayer(enemy, player); // Adiciona a função de perseguição
+            }
+            
+            // Verifica se o inimigo está no cooldown antes de permitir outro ataque
+            if (enemy.canAttack && Phaser.Geom.Intersects.RectangleToRectangle(enemy.getBounds(), player.getBoundsRectangle())) {
+                this.handleDamageTakenEnemies(enemy);
+                console.log("Inimigo atacou após o cooldown");
+                
+                // Configuração do cooldown para 3 segundos após o ataque
+                enemy.canAttack = false;
+                setTimeout(() => {
+                    enemy.canAttack = true;
+                }, 3000);
+            }
+
         }
   
 
@@ -146,4 +228,20 @@ class MainScene extends Phaser.Scene {
         this.scene.start('Scene2');
     }
  }
+
+ handleDamageTakenEnemies(enemy) {
+    player.handleTakingDamage(enemy.damage);
+ }
+
+ chasePlayer(enemy, player) {
+    const speed = 100; // Velocidade de perseguição do inimigo
+
+    if (enemy.x < player.x) {
+        enemy.setVelocityX(speed);
+    } else if (enemy.x > player.x) {
+        enemy.setVelocityX(-speed);
+    } else {
+        enemy.setVelocityX(0);
+    }
+}
 }

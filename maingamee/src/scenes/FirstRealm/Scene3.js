@@ -2,6 +2,7 @@ class Scene3 extends Phaser.Scene {
     constructor() {
         super("Scene3");
         this.enemies = {};
+        this.currentRealm = 'firstRealm';
     }
 
     preload() {

@@ -15,8 +15,11 @@ class Slime extends Phaser.Physics.Arcade.Sprite {
         this.body.setOffset(8, 0); // Exemplo de configuração do offset do corpo do inimigo
 
             // Exemplo de propriedades adicionais
-        this.health = 10;
-        this.attackPower = 10;
+        this.health = 50;
+        this.damage = 5;
+
+        // Criar a barra de vida para o slime
+        this.healthBar = new HealthBar(scene, this.x - 20, this.y - 40, 40, 5, this.health, false); // Posição e dimensões da barra de vida
 
 
         //Criação das animações do slime
@@ -37,26 +40,41 @@ class Slime extends Phaser.Physics.Arcade.Sprite {
         this.play('stand'); // 'move' é o nome da animação de movimento
 
         // Criar o retângulo centrado no slime usando Phaser.Geom.Rectangle
-        this.rectangle = new Phaser.Geom.Rectangle(x - 188, y - 96, 128, 192); // x - 24 e y - 24 para centralizar
+        this.rectangle = new Phaser.Geom.Rectangle(x - 188, y - 96, 384, 192); // x - 24 e y - 24 para centralizar
         this.rectangleGraphics = scene.add.graphics({ lineStyle: { color: 0xff0000 } });
         this.rectangleGraphics.strokeRectShape(this.rectangle);
 
         // Atualizar posição do retângulo com a posição do slime
         this.updateRectanglePosition();
+
+        this.canAttack = true;
+
+        this.enterRange = false;
+
+        // Atualizar a posição da barra de vida com a posição do slime
+        //this.updateHealthBarPosition();
     }
 
     update() {
         this.updateRectanglePosition();
+
+        this.updateHealthBarPosition();
     }
 
     updateRectanglePosition() {
         // Atualiza a posição do retângulo para estar centrado no slime
-        this.rectangle.x = this.x - 64;
+        this.rectangle.x = this.x - 188;
         this.rectangle.y = this.y - 96;
 
         // Limpar e redesenhar o retângulo com a nova posição
         this.rectangleGraphics.clear();
         this.rectangleGraphics.strokeRectShape(this.rectangle);
+    }
+
+    updateHealthBarPosition() {
+        // Atualizar a posição da barra de vida com a posição do slime
+        this.healthBar.x = this.x - 20;
+        this.healthBar.y = this.y - 40;
     }
 
     // Métodos adicionais específicos do inimigo podem ser definidos aqui
